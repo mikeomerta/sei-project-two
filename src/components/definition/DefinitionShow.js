@@ -2,73 +2,93 @@ import React from 'react'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
 import { useParams } from 'react-router'
-import { useHistory } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 import DefinitionCard from './DefinitionCard'
-
+import { createNotification } from '../common/Notification'
 
 function DefinitionShow() {
-  const { userWord } = useParams()
+  const params = useParams()
+  useLocation()
   const history = useHistory()
   const [words, setWords] = React.useState(null)
-  const id = uuid()
-  
+  const [userWord, setUserWord] = React.useState(params.userWord)
+  const [isSpellingError, setSpellingIsError] = React.useState(false)
+  const [userNewWord, setUserNewWord] = React.useState('')
 
   React.useEffect(() => {
     const getData = async () => {
-      const res = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${userWord}`)
-      console.log(res.data)
-      setWords(res.data)
+      try {
+        const res = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${userWord}`)
+        setWords(res.data)
+      } catch (err) {
+        setSpellingIsError(true)
+      }
     }
     getData()
   }, [userWord])
+    
+  const handleSubmit = (e) => {
+    e.preventDefault() 
+    userNewWord.toLowerCase()
+    if (isSpellingError) {
+      createNotification
+      setSpellingIsError(false)
+    } else {
+      setUserWord(userNewWord)
+    }
+  }
 
+  const handleChange = (e) => {
+    setUserNewWord(e.target.value)
+  } 
+  
   const handleReset = () => {
     history.push('/')
   }  
 
-  const [userNewWord, setUserNewWord] = React.useState('')
-
-  const handleSubmit = (e) => {
-    e.preventDefault() 
-    userNewWord.toLowerCase()
-    history.push('/')
-    history.push(`/${userNewWord.toLowerCase()}`)
-  }
-
-  const handleChange = (e) => {
-    setUserNewWord(e.target.value )
-  }
-
   return (
-    <section className="hero is-fullheight-with-navbar">
-      <div className="hero-body has-text-centered">
-        <div className="container-centered">
-          <div>
-            <form onSubmit={handleSubmit}>
-              <input
-                onBlur={handleChange}
-                placeholder="Search Again"
-              />
-              <button className="has-text-centered">Define</button>
-            </form>
+    <section className="container is-max-desktop is-centered">
+      <div className="column-body has-text-centered">
+        <div className="container is-centered">
+          <div className="section">
+            <h1 className="title is-1 has-text-centered">
+            English Dictionary
+            </h1>
           </div>
-          <h1 className="title is-1 has-text-centered">
-            Definition Page <span>📔</span>
-          </h1>
+          <div className="container">
+            <div className="container is-centered">
+              <div className="section">
+                <form className="level" onSubmit={handleSubmit}>
+                  <input
+                    className="input is-primary level-item"
+                    type="text"
+                    onChange={handleChange}
+                    placeholder="Search Again"
+                  />
+                  <div className="level-right">
+                    <button className="button is-primary" type="submit" onSubmit={handleSubmit}>Define</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {isSpellingError && createNotification()}
           {words &&
             words.map(word => (
               <DefinitionCard
-                key={id}
+                key={uuid()}
                 name={word.word}
                 phonetic={word.phonetic}
                 origin={word.origin}
                 element={word.meanings[0].partOfSpeech}
                 def={word.meanings[0].definitions.map(definition => definition.definition)}
-                audio={word.phonetics[0].audio}
+                audio={word.phonetics[0] ? word.phonetics[0].audio : null}
               />
             ))}
-          <div onClick={handleReset} className="box-has-text-centered">
-            <button className="button is-hovered" onClick={handleReset}>Home</button>
+          <div className="section">
+            <div className="box-has-text-centered">
+              <button className="button is-primary" onClick={handleReset}>Home</button>
+            </div>
           </div>
         </div>
       </div>

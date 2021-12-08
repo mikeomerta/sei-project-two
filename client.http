@@ -2,6 +2,6 @@ GET https://api.dictionaryapi.dev/api/v2/entries/en/cat
 
 ###
 
-# GET https://api.perfecttense.com
+GET https://uselessfacts.jsph.pl//random.json?language=en
 
 
