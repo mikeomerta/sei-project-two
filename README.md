@@ -1,4 +1,5 @@
-# General Assembly Software Engineering Immersive: Project 2
+# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) General Assembly Software Engineering Immersive: Project 2
+
 
 ![homepage](assets/Screenshot%202022-02-22%20at%2012.32.56.png?raw=true)
 
